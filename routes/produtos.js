@@ -22,8 +22,14 @@ router.get("/:id_produto", (req, res, next) => {
 });
 
 router.post("/", (req, res, next) => {
+  const produto = {
+    nome: req.body.nome,
+    preco: req.body.preco,
+  };
+
   res.status(201).send({
     mensagem: "POST na rota de produtos",
+    produtoCriado: produto,
   });
 });
 
