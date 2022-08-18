@@ -1,0 +1,28 @@
+{
+  "name": "rest-node",
+  "version": "1.0.0",
+  "description": "Exemplo de API utilizando Node.js",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Theusaopia/node-api.git"
+  },
+  "keywords": [
+    "node",
+    "javascript",
+    "rest",
+    "api"
+  ],
+  "author": "Matheus Dias",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Theusaopia/node-api/issues"
+  },
+  "homepage": "https://github.com/Theusaopia/node-api#readme",
+  "dependencies": {
+    "express": "^4.18.1"
+  }
+}
