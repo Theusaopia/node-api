@@ -8,31 +8,44 @@ router.get("/", (req, res, next) => {
       return res.status(500).send({ error: error });
     }
 
-    conn.query("SELECT * FROM pedidos", (error, result, field) => {
-      if (error) {
-        return res.status(500).send({
-          error: error,
-        });
+    conn.query(
+      `SELECT pedidos.id_pedidos,
+                        pedidos.quantidade,
+                        produtos.id_produto,
+                        produtos.nome,
+                        produtos.preco
+                FROM pedidos
+                INNER JOIN produtos
+                ON produtos.id_produto = pedidos.id_produto`,
+      (error, result, field) => {
+        if (error) {
+          return res.status(500).send({
+            error: error,
+          });
+        }
+
+        const response = {
+          pedidos: result.map((ped) => {
+            return {
+              id_pedido: ped.id_pedidos,
+              quantidade: ped.quantidade,
+              produto: {
+                id_produto: ped.id_produto,
+                nome: ped.nome,
+                preco: ped.preco,
+              },
+              request: {
+                tipo: "GET",
+                descricao: "Retorna detalhes do pedido",
+                url: "http://localhost:3000/pedidos/" + ped.id_pedidos,
+              },
+            };
+          }),
+        };
+
+        return res.status(200).send(response);
       }
-
-      const response = {
-        quantidade: result.length,
-        pedidos: result.map((ped) => {
-          return {
-            id_pedido: ped.id_pedidos,
-            id_produto: ped.id_produto,
-            quantidade: ped.quantidade,
-            request: {
-              tipo: "GET",
-              descricao: "Retorna detalhes do pedido",
-              url: "http://localhost:3000/pedidos/" + ped.id_pedidos,
-            },
-          };
-        }),
-      };
-
-      return res.status(200).send(response);
-    });
+    );
   });
 });
 
