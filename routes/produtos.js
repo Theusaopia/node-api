@@ -1,6 +1,7 @@
 const express = require("express");
 const router = express.Router();
 const mysql = require("../mysql").pool;
+const login = require("../middleware/login");
 
 //multer
 const multer = require("multer");
@@ -109,45 +110,51 @@ router.get("/:id_produto", (req, res, next) => {
   });
 });
 
-router.post("/", upload.single("produto_imagem"), (req, res, next) => {
-  mysql.getConnection((error, conn) => {
-    if (error) {
-      return res.status(500).send({ error: error });
-    }
-    conn.query(
-      "INSERT INTO produtos (nome, preco, imagem_produto) VALUES (?, ?, ?)",
-      [req.body.nome, req.body.preco, req.file.path],
-      (error, result, field) => {
-        conn.release();
-
-        if (error) {
-          return res.status(500).send({
-            error: error,
-          });
-        }
-
-        const response = {
-          mensagem: "Produto inserido com sucesso",
-          produtoCriado: {
-            id_produto: result.id_produto,
-            nome: req.body.nome,
-            preco: req.body.preco,
-            imagem_produto: req.file.path,
-            request: {
-              tipo: "GET",
-              descricao: "Retorna todos os produtos",
-              url: "http://localhost:3000/produtos/",
-            },
-          },
-        };
-
-        return res.status(201).send(response);
+router.post(
+  "/",
+  login.obrigatorio,
+  upload.single("produto_imagem"),
+  (req, res, next) => {
+    mysql.getConnection((error, conn) => {
+      if (error) {
+        return res.status(500).send({ error: error });
       }
-    );
-  });
-});
 
-router.patch("/:id_produto", (req, res, next) => {
+      conn.query(
+        "INSERT INTO produtos (nome, preco, imagem_produto) VALUES (?, ?, ?)",
+        [req.body.nome, req.body.preco, req.file.path],
+        (error, result, field) => {
+          conn.release();
+
+          if (error) {
+            return res.status(500).send({
+              error: error,
+            });
+          }
+
+          const response = {
+            mensagem: "Produto inserido com sucesso",
+            produtoCriado: {
+              id_produto: result.id_produto,
+              nome: req.body.nome,
+              preco: req.body.preco,
+              imagem_produto: req.file.path,
+              request: {
+                tipo: "GET",
+                descricao: "Retorna todos os produtos",
+                url: "http://localhost:3000/produtos/",
+              },
+            },
+          };
+
+          return res.status(201).send(response);
+        }
+      );
+    });
+  }
+);
+
+router.patch("/:id_produto", login.obrigatorio, (req, res, next) => {
   mysql.getConnection((error, conn) => {
     if (error) {
       return res.status(500).send({ error: error });
@@ -187,7 +194,7 @@ router.patch("/:id_produto", (req, res, next) => {
   });
 });
 
-router.delete("/:id_produto", (req, res, next) => {
+router.delete("/:id_produto", login.obrigatorio, (req, res, next) => {
   mysql.getConnection((error, conn) => {
     if (error) {
       return res.status(500).send({ error: error });
